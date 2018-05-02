@@ -25,9 +25,9 @@ if __name__ == "__main__":
     # 빗썸
     postList = []
     postList.clear()
-    html = requests.get("http://bithumb.cafe/notice", headers=header)
+    html = requests.get("http://bithumb.cafe/archives/category/notice", headers=header)
     bs4 = BeautifulSoup(html.text, 'lxml')
-    div = bs4.find("div", id="primary-fullwidth")
+    div = bs4.find("div", id="primary-left")
     # 최근 post만 가져오기
     posts = div.find_all("article")
     for article in posts:
@@ -54,45 +54,54 @@ if __name__ == "__main__":
         now = time.localtime()
         s = "%04d-%02d-%02d %02d:%02d:%02d" % (
         now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
-        html = requests.get('https://api-manager.upbit.com/api/v1/notices?page=1&per_page=20')
-        jsonlists = json.loads(html.text)
-        lists = jsonlists['data']['list']
-        for list in lists:
-            if list['id'] not in idList:
-                idList.append(list['id'])
-                print("\t>>> [업비트] 감지   : ", s)
-                print("\t>>> [업비트] TITLE  : ", list['title'])
-                print("\t>>> [업비트] CREATE : ", list['created_at'])
-                print("\t>>> [업비트] UPDATE : ", list['updated_at'])
-                mixer.music.load('./alarm.mp3')
-                mixer.music.play()
+        try:
+            html = requests.get('https://api-manager.upbit.com/api/v1/notices?page=1&per_page=20')
+            jsonlists = json.loads(html.text)
+            lists = jsonlists['data']['list']
+            for list in lists:
+                if list['id'] not in idList:
+                    idList.append(list['id'])
+                    print("\t>>> [업비트] 감지   : ", s)
+                    print("\t>>> [업비트] TITLE  : ", list['title'])
+                    print("\t>>> [업비트] CREATE : ", list['created_at'])
+                    print("\t>>> [업비트] UPDATE : ", list['updated_at'])
+                    mixer.music.load('./alarm.mp3')
+                    mixer.music.play()
+        except:
+            print(">>> 업비트 확인바람 ")
 
-        html = requests.get("http://bithumb.cafe/notice", headers=header)
-        bs4 = BeautifulSoup(html.text, 'lxml')
-        div = bs4.find("div", id="primary-fullwidth")
-        posts = div.find_all("article")
-        for article in posts:
-            post = article.find("h3").find("a")
-            post_title = post.get_text().strip()
-            if post_title not in postList:
-                postList.append(post_title)
-                print("\t>>> [빗썸] 감지   : ", s)
-                print("\t>>> [빗썸] TITLE  : ", post_title)
-                mixer.music.load('./alarm.mp3')
-                mixer.music.play()
+        try:
+            html = requests.get("http://bithumb.cafe/archives/category/notice", headers=header)
+            bs4 = BeautifulSoup(html.text, 'lxml')
+            div = bs4.find("div", id="primary-left")
+            posts = div.find_all("article")
+            for article in posts:
+                post = article.find("h3").find("a")
+                post_title = post.get_text().strip()
+                if post_title not in postList:
+                    postList.append(post_title)
+                    print("\t>>> [빗썸] 감지   : ", s)
+                    print("\t>>> [빗썸] TITLE  : ", post_title)
+                    mixer.music.load('./alarm.mp3')
+                    mixer.music.play()
+        except:
+            print(">>> 빗썸 확인바람 ")
         #
-        html = requests.get("https://support.binance.com/hc/en-us/sections/115000106672-New-Listings", headers=header)
-        bs4 = BeautifulSoup(html.text, 'lxml')
-        div = bs4.find("ul", class_='article-list')
-        bposts = div.find_all("li")
-        for barticle in bposts:
-            bpost = barticle.find("a")
-            if bpost.get_text().strip() not in binanceList:
-                binanceList.append(bpost.get_text().strip())
-                print("\t>>> [바이낸스] 감지   : ", s)
-                print("\t>>> [바이낸스] TITLE  : ", bpost.get_text().strip())
-                mixer.music.load('./alarm.mp3')
-                mixer.music.play()
+        try:
+            html = requests.get("https://support.binance.com/hc/en-us/sections/115000106672-New-Listings", headers=header)
+            bs4 = BeautifulSoup(html.text, 'lxml')
+            div = bs4.find("ul", class_='article-list')
+            bposts = div.find_all("li")
+            for barticle in bposts:
+                bpost = barticle.find("a")
+                if bpost.get_text().strip() not in binanceList:
+                    binanceList.append(bpost.get_text().strip())
+                    print("\t>>> [바이낸스] 감지   : ", s)
+                    print("\t>>> [바이낸스] TITLE  : ", bpost.get_text().strip())
+                    mixer.music.load('./alarm.mp3')
+                    mixer.music.play()
+        except:
+            print(">>> 바이낸스 확인바람 ")
         time.sleep(DELAY)
 
 
